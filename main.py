@@ -60,13 +60,13 @@ X_train, X_test, Y_train, Y_test = train_test_split(myData.drop('target', 1), my
 model = Sequential()
 model.add(Dense(100, input_shape=(19,)))
 model.add(ReLU())
-model.add(Dropout(0.3))
+#model.add(Dropout(0.3))
 model.add(Dense(100))
 model.add(ReLU())
-model.add(Dropout(0.3))
+#model.add(Dropout(0.3))
 model.add(Dense(10))
 model.add(ReLU())
-model.add(Dropout(0.3))
+#model.add(Dropout(0.3))
 model.add(Dense(1, activation='sigmoid'))
 model.summary()
 
@@ -80,19 +80,17 @@ model.compile(optimizer='Adam', loss='categorical_hinge', metrics=['accuracy'])
 #model.compile(optimizer='Adam', loss='mean_squared_logarithmic_error', metrics=['accuracy'])
 
 
-
 for i in range(150):
     model.fit(X_train, Y_train)
-
 
 y_predicted = model.predict(X_test)
 
 conf_mat = confusion_matrix(Y_test, np.round(y_predicted))
 print(conf_mat)
 total = sum(sum(conf_mat))
-sensitivity = conf_mat[0,0]/(conf_mat[0,0] + conf_mat[1,0])
-specificity = conf_mat[1,1]/(conf_mat[1,1] + conf_mat[0,1])
-accuracy = (conf_mat[0,0] + conf_mat[1,1])/total
+sensitivity = conf_mat[0, 0]/(conf_mat[0, 0] + conf_mat[1, 0])
+specificity = conf_mat[1, 1]/(conf_mat[1, 1] + conf_mat[0, 1])
+accuracy = (conf_mat[0, 0] + conf_mat[1, 1])/total
 
 
 print('specificity : ', specificity)
@@ -104,5 +102,5 @@ print('accuracy : ', accuracy)
 
 plt.figure(figsize=(10,10))
 sns.heatmap(myData.corr(), annot=True, fmt='.1f')
-#plt.show()
+plt.show()
 
