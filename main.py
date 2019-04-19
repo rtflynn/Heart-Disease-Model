@@ -80,8 +80,7 @@ model.compile(optimizer='Adam', loss='categorical_hinge', metrics=['accuracy'])
 #model.compile(optimizer='Adam', loss='mean_squared_logarithmic_error', metrics=['accuracy'])
 
 
-for i in range(150):
-    model.fit(X_train, Y_train)
+model.fit(X_train, Y_train, epochs=150)
 
 y_predicted = model.predict(X_test)
 
@@ -100,7 +99,7 @@ print('accuracy : ', accuracy)
 #print(myData.info())
 #print(myData.shape)             # Rows then Columns
 
-#plt.figure(figsize=(10,10))
-#sns.heatmap(myData.corr(), annot=True, fmt='.1f')
-#plt.show()
+plt.figure(figsize=(10,10))
+sns.heatmap(myData.corr(), annot=True, fmt='.1f')
+plt.show()
 
