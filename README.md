@@ -104,8 +104,9 @@ accuracy :  0.8852459016393442
 ```
 
 
-Some analysis:  After looking through some kaggle kernels on this problem, I noticed that many models achieved test accuracy of .885.  This number was consistent across:  Random forest, decision tree, k-nearest neighbor, SVM, logistic regression, deep and shallow NN, etc.  The fact that so many classifiers got to the same 88.5% accuracy suggests that the Bayes error for this task may well be close to 11.5%.  
+Some analysis:  The confusion matrix is interpreted as follows:  Upon running our learned model on the test set, the model came up with 23 true negatives and 31 true positives.  There were 3 false positives and 4 false negatives, leading to specificity of 31/35 and sensitivity of 23/26.
 
+After looking through some kaggle kernels on this problem, I noticed that many models achieved test accuracy of .885.  This number was consistent across:  Random forest, decision tree, k-nearest neighbor, SVM, logistic regression, deep and shallow NN, etc.  The fact that so many classifiers got to the same 88.5% accuracy suggests that the Bayes error for this task may well be close to 11.5%.  
 
 
 (Chen: Opinion on the followin plz)
