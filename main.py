@@ -87,9 +87,7 @@ print(myData.head(10))          # So now our data is normalized, all between 0 a
 
 X_train = X_train / X_train.max()
 X_test = X_test / X_test.max()
-
-
-
+##### WHOOPS!  Fix this tomorrow!  We should never normalize train and test sets separately!!!
 
 
 print(X_train.shape)
