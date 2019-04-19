@@ -72,8 +72,7 @@ model.compile(optimizer='Adam', loss='categorical_hinge', metrics=['accuracy'])
 
 Train the model:
 ```python
-for i in range(150):
-    model.fit(X_train, Y_train)
+model.fit(X_train, Y_train, epochs=150)
 ```
 
 
