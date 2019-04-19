@@ -100,7 +100,7 @@ print('accuracy : ', accuracy)
 #print(myData.info())
 #print(myData.shape)             # Rows then Columns
 
-plt.figure(figsize=(10,10))
-sns.heatmap(myData.corr(), annot=True, fmt='.1f')
-plt.show()
+#plt.figure(figsize=(10,10))
+#sns.heatmap(myData.corr(), annot=True, fmt='.1f')
+#plt.show()
 
