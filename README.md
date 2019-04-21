@@ -128,3 +128,14 @@ By the way, I think the data set has a problem.  The 'target' variable is suppos
 
 
 
+
+
+(Sketch) Closing remarks:  
+ - Bayes error is probably somewhere around 8-10%
+ - naive Bayes model achieves nearly 92% accuracy, but this may be due to random chance plus not having a validation set, and is almost certainly helped by the fact that the test set is tiny, so getting just one more correct prediction corresponds to a large percentage jump in accuracy. 
+  - Random Forest with 100 estimators achieves 90% accuracy.  This accuracy falls with more estimators.  (Note to self, we should do a search to find the optimal number of estimators)
+  - logistic regression, k-nearest-neighbor, SVM, and Neural Net all achieve 85.5% accuracy.  
+  - Some words on the least and most important features when it comes to predicting heart disease.
+
+
+
