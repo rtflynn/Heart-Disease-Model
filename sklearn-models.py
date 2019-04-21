@@ -64,7 +64,7 @@ tree_model = DecisionTreeClassifier()
 tree_model.fit(x_train, y_train)
 print("Decision Tree Model Accuracy: ", tree_model.score(x_test, y_test))
 
-forest_model = RandomForestClassifier(n_estimators=10)
+forest_model = RandomForestClassifier(n_estimators=100)
 forest_model.fit(x_train, y_train)
 print("Random Forest Model Accuracy: ", forest_model.score(x_test, y_test))
 
