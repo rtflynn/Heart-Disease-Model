@@ -5,6 +5,7 @@ TODO:
  - Some pretty graphs
  - PyTorch implementation
  - Intro and Outro sections
+ - After everything else, update code on readme.md to reflect final python code
 
 
 Getting started:  Import modules and load our training data.
