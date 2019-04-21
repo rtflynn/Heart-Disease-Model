@@ -1,12 +1,10 @@
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import train_test_split
 from keras.models import Sequential
-from keras.layers import Dense, ReLU, Dropout
-import tensorflow as tf                           # To remove logging
+from keras.layers import Dense, ReLU
+import tensorflow as tf                # To remove logging
 
 tf.logging.set_verbosity(tf.logging.ERROR)
 pd.options.mode.chained_assignment = None
@@ -67,8 +65,3 @@ accuracy = (conf_mat[0, 0] + conf_mat[1, 1])/total
 print('specificity : ', specificity)
 print('sensitivity : ', sensitivity)
 print('accuracy : ', accuracy)
-
-#plt.figure(figsize=(10,10))
-#sns.heatmap(myData.corr(), annot=True, fmt='.1f')
-#plt.show()
-
