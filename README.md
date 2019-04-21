@@ -1,3 +1,12 @@
+TODO:
+ - Non NN models
+ - Analysis of best models
+ - Domain knowledge
+ - Some pretty graphs
+ - PyTorch implementation
+ - Intro and Outro sections
+
+
 Getting started:  Import modules and load our training data.
 
 ```python
