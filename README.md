@@ -1,5 +1,5 @@
 TODO:
- - Non NN models
+ - Non NN models   (Done now, still need to describe what's going on in readme.md)
  - Analysis of best models
  - Domain knowledge
  - Some pretty graphs
