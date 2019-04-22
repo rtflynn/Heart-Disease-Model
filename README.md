@@ -4,8 +4,23 @@ TODO:
  - Domain knowledge
  - Some pretty graphs
  - PyTorch implementation
- - Intro and Outro sections
+ - Intro and Outro sections   (Intro done now)
  - After everything else, update code on readme.md to reflect final python code
+
+
+
+
+Intro:
+This real-world dataset was found on Kaggle, and contains data on 303 patients from (1) The Hungarian Institute of Cardiology, (2) University Hospital, Zurich, (3) University Hospital, Basel, (4) V.A. Medical Center, Long Beach, and (5) The Cleveland Clinic Foundation.  This dataset was donated to the greater scientific community in 1988 and has since been cited by dozens of academic papers and used as a sort of testing sandbox for new ideas in machine learning.  
+
+The data consists of 14 attributes.  Some attributes are continuous, like age and cholesterol level.  Some are categorical, like sex and type of chest pain.  The task is to use the first 13 attributes to predict the 14th - the presence of heart disease in a patient.  This task is complicated by the fact that the training set is so small.  We have to be very careful because even a modest (by todays standards) neural network has more degrees of freedom than there are data points in our set!
+
+In this project we'll explore various ML models for this task.  Our main tools will be the python scikit-learn and tensorflow libraries.  It should be stated straightaway, however, that we should not hope for a model with 100% accuracy - indeed, we should be skeptical of any model that does too well, as its success will likely be the result of a large parameter space. What we will find is quite reassuring:  most models achieve an accuracy of .885.  This consistency across many types of model suggests a Bayes Error probably around 8-10%.  
+
+
+
+
+
 
 
 Getting started:  Import modules and load our training data.
