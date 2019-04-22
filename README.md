@@ -8,7 +8,7 @@ TODO:
  - After everything else, update code on readme.md to reflect final python code
 
 
-#Intro:
+# Intro:
 
 This real-world dataset was found on Kaggle, and contains data on 303 patients from (1) The Hungarian Institute of Cardiology, (2) University Hospital, Zurich, (3) University Hospital, Basel, (4) V.A. Medical Center, Long Beach, and (5) The Cleveland Clinic Foundation.  This dataset was donated to the greater scientific community in 1988 and has since been cited by dozens of academic papers and used as a sort of testing sandbox for new ideas in machine learning.  
 
@@ -17,10 +17,10 @@ The data consists of 14 attributes.  Some attributes are continuous, like age an
 In this project we'll explore various ML models for this task.  Our main tools will be the python scikit-learn and tensorflow libraries.  It should be stated straightaway, however, that we should not hope for a model with 100% accuracy - indeed, we should be skeptical of any model that does too well, as its success will likely be the result of a large parameter space. What we will find is quite reassuring:  most models achieve an accuracy of .885.  This consistency across many types of model suggests a Bayes Error probably around 8-10%.  
 
 
-#Scikit-Learn Models
+# Scikit-Learn Models
 (To be added)
 
-#Deep Learning Model
+# Deep Learning Model
 Getting started:  Import modules and load our training data.
 
 ```python
@@ -143,7 +143,7 @@ By the way, I think the data set has a problem.  The 'target' variable is suppos
 
 
 
-#(Sketch) Closing remarks:  
+# (Sketch) Closing remarks:  
  - Bayes error is probably somewhere around 8-10%
  - naive Bayes model achieves nearly 92% accuracy, but this may be due to random chance plus not having a validation set, and is almost certainly helped by the fact that the test set is tiny, so getting just one more correct prediction corresponds to a large percentage jump in accuracy. 
   - Random Forest with 100 estimators achieves 90% accuracy.  This accuracy falls with more estimators.  (Note to self, we should do a search to find the optimal number of estimators)
