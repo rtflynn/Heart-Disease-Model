@@ -1,13 +1,3 @@
-TODO:
- - Non NN models   (Done now, still need to describe what's going on in readme.md)
- - Analysis of best models
- - Domain knowledge
- - Some pretty graphs
- - PyTorch implementation
- - Intro and Outro sections   (Intro done now)
- - After everything else, update code on readme.md to reflect final python code
-
-
 # Intro:
 
 This real-world dataset was found on Kaggle, and contains data on 303 patients from (1) The Hungarian Institute of Cardiology, (2) University Hospital, Zurich, (3) University Hospital, Basel, (4) V.A. Medical Center, Long Beach, and (5) The Cleveland Clinic Foundation.  This dataset was donated to the greater scientific community in 1988 and has since been cited by dozens of academic papers and used as a sort of testing sandbox for new ideas in machine learning.  
@@ -200,11 +190,71 @@ Another way to decrease false negatives is to create an ensemble voting model ou
 
 
 
+# Voting Ensemble
+A popular technique in modern machine learning is to combine several models into a single model which uses majority vote.  We'll carry this out here with the 7 models defined above.  In more detail, we'll make a model `vote_model` which takes an input `x` and feeds it into our 7 models, counts the predictions (0 or 1), and returns 1 if (say) 4 of our 7 models predicted 1.  
 
-After looking through some kaggle kernels on this problem, I noticed that many models achieved test accuracy of .885.  This number was consistent across:  Random forest, decision tree, k-nearest neighbor, SVM, logistic regression, deep and shallow NN, etc.  The fact that so many classifiers got to the same 88.5% accuracy suggests that the Bayes error for this task may well be close to 11.5%.  
+This gives us another way to decrease the number of false negatives:  simply change the threshold so that `vote_model` predicts 1 if 3 (or 2, or 1) of our 7 models predicted 1.  Of course this will increase the number of false positives, but for medical diagnosis this is a welcome tradeoff.
 
+Our implementation is a bit ad-hoc because scikit-learn models and keras models return their predictions in slightly different formats.  
+```python
+votes = lin_model.predict(x_test) + svm_model.predict(x_test) + nb_model.predict(x_test) \
+        + forest_model.predict(x_test) + tree_model.predict(x_test) + knn_model.predict(x_test) \
+        + ((nn_model.predict(x_test)>0.5).T)[0].astype(float)
+```
 
+`votes` is now a numpy array populated with integers 0-7 depending on how many votes the corresponding element of the test set got.  Next we can test our vote results against our known test labels:
 
+```python
+conf_mat = confusion_matrix((y_test.values == 1.0),  (votes >= 4))
+total = sum(sum(conf_mat))
+sensitivity = conf_mat[0, 0]/(conf_mat[0, 0] + conf_mat[1, 0])
+specificity = conf_mat[1, 1]/(conf_mat[1, 1] + conf_mat[0, 1])
+accuracy = (conf_mat[0, 0] + conf_mat[1, 1])/total
+
+print("Statistics for voting classifier, where simple majority rules:\n")
+print(conf_mat)
+print('specificity : ', specificity)
+print('sensitivity : ', sensitivity)
+print('accuracy : ', accuracy)
+```
+ 
+ ```
+ Statistics for voting classifier, where simple majority rules:
+
+[[23  4]
+ [ 5 29]]
+specificity :  0.8787878787878788
+sensitivity :  0.8214285714285714
+accuracy :  0.8524590163934426
+```
+
+This model gives 5 false negatives - quite high.  Let's back it off a bit by changing the vote threshold:
+```python
+conf_mat = confusion_matrix((y_test.values == 1.0),  (votes >= 2))
+total = sum(sum(conf_mat))
+sensitivity = conf_mat[0, 0]/(conf_mat[0, 0] + conf_mat[1, 0])
+specificity = conf_mat[1, 1]/(conf_mat[1, 1] + conf_mat[0, 1])
+accuracy = (conf_mat[0, 0] + conf_mat[1, 1])/total
+
+print("Statistics for voting classifier, where it only takes 2 positive votes (out of 7 votes) to declare "
+      "a positive result:\n")
+print(conf_mat)
+print('specificity : ', specificity)
+print('sensitivity : ', sensitivity)
+print('accuracy : ', accuracy)
+```
+
+```
+Statistics for voting classifier, where it only takes 2 positive votes (out of 7 votes) to declare a positive result:
+
+[[21  6]
+ [ 2 32]]
+specificity :  0.8421052631578947
+sensitivity :  0.9130434782608695
+accuracy :  0.8688524590163934
+```
+
+Now we're down to 2 false negatives - much better for this sort of application.  
 
 
 # Closing Remarks:
@@ -214,16 +264,7 @@ While looking into this dataset I noticed that the 'target' variable may have be
  
  We see that 'target' is negatively correlated with age, cholesterol level, being male, ... All things which one would think make heart disease more likely, not less.  I decided to hold this until the conclusion because it doesn't change *how* one would carry out this analysis; it simply changes the model one arrives at.  
  
+After looking through some kaggle kernels on this problem, I noticed that many models achieved test accuracy of .885.  This number was consistent across:  Random forest, decision tree, k-nearest neighbor, SVM, logistic regression, deep and shallow NN, etc.  The fact that so many classifiers got to the same 88.5% accuracy suggests that the Bayes error for this task may well be close to 11.5%.  
 
-
-
-
-# (Sketch) Closing remarks:  
- - Bayes error is probably somewhere around 8-10%
- - naive Bayes model achieves nearly 92% accuracy, but this may be due to random chance plus not having a validation set, and is almost certainly helped by the fact that the test set is tiny, so getting just one more correct prediction corresponds to a large percentage jump in accuracy. 
-  - Random Forest with 100 estimators achieves 90% accuracy.  This accuracy falls with more estimators.  (Note to self, we should do a search to find the optimal number of estimators)
-  - logistic regression, k-nearest-neighbor, SVM, and Neural Net all achieve 85.5% accuracy.  
-  - Some words on the least and most important features when it comes to predicting heart disease.
-
-
+Finally, there is a lot of tuning to be done here.  Each scikit-learn model has tons of parameters to tune, and we've mostly opted for the default values.  Our Keras model could definitely be improved as well.  We could also reduce false negatives by first reducing them on each individual model, and then using a voting ensemble which requires a supermajority to return a positive.
 
