@@ -46,7 +46,7 @@ myData = pd.read_csv("heart.csv")
 
 Next (Optional): Rename data fields to be more descriptive.
 
-```
+```python
 myData = pd.read_csv("heart.csv")
 myData.columns = ['age', 'sex', 'chest_pain_type', 'resting_blood_pressure', 'cholesterol', 'fasting_blood_sugar', 'rest_ecg', 'max_heart_rate_achieved', 'exercise_induced_angina', 'st_depression', 'st_slope', 'num_major_vessels', 'thalassemia', 'target']
 myData['sex'][myData['sex'] == 0] = 'female'
@@ -71,13 +71,13 @@ myData['thalassemia'][myData['thalassemia'] == 3] = 'reversible defect'
 ```
 
 Important: Use one-hot encoding for categorical variables.
-```
+```python
 myData = pd.get_dummies(myData, drop_first=True)
 ```
 
 Prepare the data:  Neural networks train much (much, much) quicker on normalized datasets.  
 It's also important to reserve part of the dataset as a test set.  Unfortunately this dataset is very small, so we can't really afford to set aside a validation set.  Let's reserve 20% of our data as a test set.
-```
+```python
 myData = (myData - np.min(myData))/(np.max(myData) - np.min(myData))
 x = myData.drop('target', axis=1)
 y = myData['target']
@@ -89,7 +89,7 @@ x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=.2, random_s
 # Scikit-Learn Models
 Scikit-learn enables us to quickly build and train models to a dataset.  Each of these models has a fit() method, as well as predict() and score().  This uniformity will allow us to make an ensemble voting classifier without much effort.
 
-```
+```python
 lin_model = LogisticRegression(solver='lbfgs')
 lin_model.fit(x_train, y_train)
 print("Linear Model Accuracy: ", lin_model.score(x_test, y_test))
@@ -128,7 +128,7 @@ Random Forest Model Accuracy:  0.8360655737704918
 
 # Deep Learning Model
 
-We'll build a simple model with two fully-connected layers of 100 units each, and ReLU activations.  The best choices for loss function for a classification task are typically binary_crossentropy and categorical_hinge.  Categorical_hinge is a direct generalization of SVM, and happens to work well here, so that's what we'll go with.
+We'll build a simple model with three fully-connected layers of 100 units, 100 units, 10 units, and ReLU activations.  This last layer feeds into a single unit with sigmoid activation.  The best choices for loss function for a classification task are typically binary_crossentropy and categorical_hinge.  Categorical_hinge is a direct generalization of SVM, and happens to work well here, so that's what we'll go with.
 ```python
 model = Sequential()
 model.add(Dense(100, input_shape=(19,)))
@@ -146,15 +146,15 @@ model.compile(optimizer='Adam', loss='categorical_hinge', metrics=['accuracy'])
 
 Train the model:
 ```python
-model.fit(X_train, Y_train, epochs=150)
+model.fit(X_train, Y_train, epochs=15)
 ```
 
 
 And check how it does on our test set:
 ```python
-y_predicted = model.predict(X_test)
+y_predicted = (model.predict(X_test) >= 0.5)
 
-conf_mat = confusion_matrix(Y_test, np.round(y_predicted))
+conf_mat = confusion_matrix(Y_test, y_predicted)
 print(conf_mat)
 total = sum(sum(conf_mat))
 sensitivity = conf_mat[0, 0]/(conf_mat[0, 0] + conf_mat[1, 0])
@@ -176,13 +176,12 @@ accuracy :  0.8852459016393442
 
 ```
 
-Some analysis:  The confusion matrix is interpreted as follows:  Upon running our learned model on the test set, the model came up with 23 true negatives and 31 true positives.  There were 3 false positives and 4 false negatives, leading to specificity of 31/35 and sensitivity of 23/26.  It must be noted that since the test set is so small (61 samples), every right or wrong answer alters the accuracy score by about 1.5%.  This volatility is very undesirable and heavily rewards overfitting to the test set - again, something which could be avoided if we had enough data for a validation set.
+Some analysis:  The confusion matrix is interpreted as follows:  Upon running our learned model on the test set, the model came up with 23 true negatives and 31 true positives.  There were 4 false positives and 3 false negatives, leading to specificity of 31/35 and sensitivity of 23/26.  It must be noted that since the test set is so small (61 samples), every right or wrong answer alters the accuracy score by about 1.5%.  This volatility is very undesirable and heavily rewards overfitting to the test set - again, something which could be avoided if we had enough data for a validation set.
 
 Since this model predicts something as important as heart disease, we're much happier with false positives than with false negatives.  There are several ways to decrease the number of false negatives.  Recall that this neural network has a last-layer sigmoid, so the activation of the final neuron is somewhere between 0 and 1.  By default we round to the nearest integer to obtain a prediction, so that (for example) if some input to the network leads to a final neuron activation of 0.6, we predict heart disease, and if some input leads to a final activation of 0.4, we predict no heart disease.  Instead of rounding to the nearest integer (i.e. returning (final_activation >= 0.5) ), we could change the cutoff point to some other value.  Consider the following variant:
 
 ```python
-y_predicted = model.predict(x_test)
-y_predicted = (y_predicted >= 0.15)
+y_predicted = (model.predict(x_test) > 0.15)
 ```
 
 We now predict heart disease in individuals whose data leads to a final neuron activation of 0.15 or more.  We may have caught some of the patients who would have fallen through the cracks using the stricter cutoff of 0.5.  Indeed, after this change we obtain the following confusion matrix, specificity, sensitivity, accuracy:
