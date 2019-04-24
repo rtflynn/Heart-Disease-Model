@@ -184,7 +184,7 @@ Since this model predicts something as important as heart disease, we're much ha
 y_predicted = (model.predict(x_test) > 0.15)
 ```
 
-We now predict heart disease in individuals whose data leads to a final neuron activation of 0.15 or more.  We may have caught some of the patients who would have fallen through the cracks using the stricter cutoff of 0.5.  Indeed, after this change we obtain the following confusion matrix, specificity, sensitivity, accuracy:
+We now predict heart disease in individuals whose data leads to a final neuron activation of 0.15 or more.  We may catch some of the patients who would have fallen through the cracks using the stricter cutoff of 0.5.  Indeed, after this change we obtain the following confusion matrix, specificity, sensitivity, accuracy:
 
 ```
 [[17 10]
