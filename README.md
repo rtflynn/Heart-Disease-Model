@@ -115,6 +115,16 @@ forest_model.fit(x_train, y_train)
 print("Random Forest Model Accuracy: ", forest_model.score(x_test, y_test))
 ```
 
+Outputs will vary (quite a bit, actually!) depending on random seeds.  One run produced the following output:
+```
+Linear Model Accuracy:  0.8524590163934426
+K Nearest Neighbor Model Accuracy:  0.8360655737704918
+Support Vector Machine Model Accuracy:  0.8524590163934426
+Naive Bayes Model Accuracy:  0.8688524590163934
+Decision Tree Model Accuracy:  0.7540983606557377
+Random Forest Model Accuracy:  0.8360655737704918
+```
+
 
 # Deep Learning Model
 
