@@ -17,33 +17,38 @@ The data consists of 14 attributes.  Some attributes are continuous, like age an
 In this project we'll explore various ML models for this task.  Our main tools will be the python scikit-learn and tensorflow libraries.  It should be stated straightaway, however, that we should not hope for a model with 100% accuracy - indeed, we should be skeptical of any model that does too well, as its success will likely be the result of a large parameter space. What we will find is quite reassuring:  most models achieve an accuracy of .885.  This consistency across many types of model suggests a Bayes Error probably around 8-10%.  
 
 
-# Scikit-Learn Models
-(To be added)
 
-# Deep Learning Model
-Getting started:  Import modules and load our training data.
+# Getting Started: Imports and Data Preparation
+Let's go ahead and import our modules and load our training data:
 
 ```python
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+
 from sklearn.metrics import confusion_matrix
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split 
+
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+from sklearn.naive_bayes import GaussianNB
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+
 from keras.models import Sequential
 from keras.layers import Dense, ReLU, Dropout
-np.random.seed(100)
 
-pd.options.mode.chained_assignment = None
-
+pd.options.mode.chained_assignment = None            # Get rid of warning messages
 myData = pd.read_csv("heart.csv")
 ```
 
-Next (Optional): Rename field values to be more descriptive.
+Next (Optional): Rename data fields to be more descriptive.
 
-```python
+```
+myData = pd.read_csv("heart.csv")
 myData.columns = ['age', 'sex', 'chest_pain_type', 'resting_blood_pressure', 'cholesterol', 'fasting_blood_sugar', 'rest_ecg', 'max_heart_rate_achieved', 'exercise_induced_angina', 'st_depression', 'st_slope', 'num_major_vessels', 'thalassemia', 'target']
-
 myData['sex'][myData['sex'] == 0] = 'female'
 myData['sex'][myData['sex'] == 1] = 'male'
 myData['chest_pain_type'][myData['chest_pain_type'] == 1] = 'typical angina'
@@ -65,19 +70,55 @@ myData['thalassemia'][myData['thalassemia'] == 2] = 'fixed defect'
 myData['thalassemia'][myData['thalassemia'] == 3] = 'reversible defect'
 ```
 
-Important:  Use one-hot encoding for categorical variables.
-```python
+Important: Use one-hot encoding for categorical variables.
+```
 myData = pd.get_dummies(myData, drop_first=True)
 ```
 
 Prepare the data:  Neural networks train much (much, much) quicker on normalized datasets.  
 It's also important to reserve part of the dataset as a test set.  Unfortunately this dataset is very small, so we can't really afford to set aside a validation set.  Let's reserve 20% of our data as a test set.
-```python
-myData = myData / myData.max()
-X_train, X_test, Y_train, Y_test = train_test_split(myData.drop('target', 1), myData['target'], test_size=.2, random_state=0)
+```
+myData = (myData - np.min(myData))/(np.max(myData) - np.min(myData))
+x = myData.drop('target', axis=1)
+y = myData['target']
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=.2, random_state=2)
 ```
 
-Build the model.  This is a simple model with two fully-connected layers of 100 units each, and ReLU activations.  The best choices for loss function for a classification task are typically binary_crossentropy and categorical_hinge.  Categorical_hinge is a direct generalization of SVM, and happens to work well here, so that's what we'll go with.
+
+
+# Scikit-Learn Models
+Scikit-learn enables us to quickly build and train models to a dataset.  Each of these models has a fit() method, as well as predict() and score().  This uniformity will allow us to make an ensemble voting classifier without much effort.
+
+```
+lin_model = LogisticRegression(solver='lbfgs')
+lin_model.fit(x_train, y_train)
+print("Linear Model Accuracy: ", lin_model.score(x_test, y_test))
+
+knn_model = KNeighborsClassifier()
+knn_model.fit(x_train, y_train)
+print("K Nearest Neighbor Model Accuracy: ", knn_model.score(x_test, y_test))
+
+svm_model = SVC(gamma='auto')
+svm_model.fit(x_train, y_train)
+print("Support Vector Machine Model Accuracy: ", svm_model.score(x_test, y_test))
+
+nb_model = GaussianNB()
+nb_model.fit(x_train, y_train)
+print("Naive Bayes Model Accuracy: ", nb_model.score(x_test, y_test))
+
+tree_model = DecisionTreeClassifier()
+tree_model.fit(x_train, y_train)
+print("Decision Tree Model Accuracy: ", tree_model.score(x_test, y_test))
+
+forest_model = RandomForestClassifier(n_estimators=100)
+forest_model.fit(x_train, y_train)
+print("Random Forest Model Accuracy: ", forest_model.score(x_test, y_test))
+```
+
+
+# Deep Learning Model
+
+We'll build a simple model with two fully-connected layers of 100 units each, and ReLU activations.  The best choices for loss function for a classification task are typically binary_crossentropy and categorical_hinge.  Categorical_hinge is a direct generalization of SVM, and happens to work well here, so that's what we'll go with.
 ```python
 model = Sequential()
 model.add(Dense(100, input_shape=(19,)))
@@ -125,20 +166,45 @@ accuracy :  0.8852459016393442
 
 ```
 
+Some analysis:  The confusion matrix is interpreted as follows:  Upon running our learned model on the test set, the model came up with 23 true negatives and 31 true positives.  There were 3 false positives and 4 false negatives, leading to specificity of 31/35 and sensitivity of 23/26.  It must be noted that since the test set is so small (61 samples), every right or wrong answer alters the accuracy score by about 1.5%.  This volatility is very undesirable and heavily rewards overfitting to the test set - again, something which could be avoided if we had enough data for a validation set.
 
-Some analysis:  The confusion matrix is interpreted as follows:  Upon running our learned model on the test set, the model came up with 23 true negatives and 31 true positives.  There were 3 false positives and 4 false negatives, leading to specificity of 31/35 and sensitivity of 23/26.
+Since this model predicts something as important as heart disease, we're much happier with false positives than with false negatives.  There are several ways to decrease the number of false negatives.  Recall that this neural network has a last-layer sigmoid, so the activation of the final neuron is somewhere between 0 and 1.  By default we round to the nearest integer to obtain a prediction, so that (for example) if some input to the network leads to a final neuron activation of 0.6, we predict heart disease, and if some input leads to a final activation of 0.4, we predict no heart disease.  Instead of rounding to the nearest integer (i.e. returning (final_activation >= 0.5) ), we could change the cutoff point to some other value.  Consider the following variant:
+
+```python
+y_predicted = model.predict(x_test)
+y_predicted = (y_predicted >= 0.15)
+```
+
+We now predict heart disease in individuals whose data leads to a final neuron activation of 0.15 or more.  We may have caught some of the patients who would have fallen through the cracks using the stricter cutoff of 0.5.  Indeed, after this change we obtain the following confusion matrix, specificity, sensitivity, accuracy:
+
+```
+[[17 10]
+ [ 1 33]]
+specificity :  0.7674418604651163
+sensitivity :  0.9444444444444444
+accuracy :  0.819672131147541
+```
+
+Many more false positives to be sure, but only one false negative.  
+
+Another way to decrease false negatives is to create an ensemble voting model out of many simpler models, and to require not just a majority vote, but a supermajority vote, to declare a negative result.
+
+
+
 
 After looking through some kaggle kernels on this problem, I noticed that many models achieved test accuracy of .885.  This number was consistent across:  Random forest, decision tree, k-nearest neighbor, SVM, logistic regression, deep and shallow NN, etc.  The fact that so many classifiers got to the same 88.5% accuracy suggests that the Bayes error for this task may well be close to 11.5%.  
 
 
-(Chen: Opinion on the followin plz)
 
-By the way, I think the data set has a problem.  The 'target' variable is supposed to be 0 if no heart disease, and 1 if heart disease, but I'm relatively (?) certain they reversed these values.  Check out the heat map.  Forget 'target' for a minute and look at the age column.  This looks like we'd expect, for example there's a 0.3 in cholesterol meaning we have a positive correlation between age and cholesterol.  We have -0.4 for max heart rate which again makes sense.
+
+
+# Closing Remarks:
+While looking into this dataset I noticed that the 'target' variable may have been entered incorrectly.  The 'target' variable is supposed to be 0 if there's no heart disease and 1 if there is heart disease.  However, looking at the following heat map of the data set suggests that it might be the other way around:
 
  ![Heatmap](/Images/heatmap.png)
-
-'target' is negatively correlated with age, cholesterol, being male....   But I don't know anything about number of blood vessels, levels of pain, etc.  What do you think?
-
+ 
+ We see that 'target' is negatively correlated with age, cholesterol level, being male, ... All things which one would think make heart disease more likely, not less.  I decided to hold this until the conclusion because it doesn't change *how* one would carry out this analysis; it simply changes the model one arrives at.  
+ 
 
 
 
